@@ -13,13 +13,13 @@ glass = datasets.glass()
 pima = datasets.pima()
 k = 9
 
-(X, y) = wine  # specify dataset here
+(X, y) = pima  # specify dataset here
 dim = len(X[0])
 size = len(X)
 
 
 def bag_size(k, percent, size):
-    res = size * (k - 1) // k * percent // 100 - 1
+    res = size * (k - 1) // k * percent // 100 - 2
     return res
 
 
@@ -47,27 +47,30 @@ print(f1)
 # -------loop------
 size_percs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 dim_percs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# classifiers_counts = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 results = np.zeros((len(size_percs), len(dim_percs)))
 for s_i in range(len(size_percs)):
     size_perc = size_percs[s_i]
     for d_i in range(len(dim_percs)):
+    # for c_i in range(len(classifiers_counts)):
         dim_perc = dim_percs[d_i]
-        # bagging = BaggingClassifier(estimator, 10, bag_size(k, size_perc, size), bag_dim(100), n_jobs=4)
+        # classifiers_count = classifiers_counts[c_i]
+        # bagging = BaggingClassifier(estimator, classifiers_count, bag_size(k, size_perc, size), bag_dim(100), n_jobs=4)
         random_forest = BaggingClassifier(estimator, 50, bag_size(k, size_perc, size), bag_dim(dim_perc), n_jobs=4)
-        f1 = k_fold((X, y), random_forest, k, True)
+        f1 = k_fold((X, y), bagging, k, True)
         results[s_i][d_i] = f1
 
 print(results)
 
 df = pd.DataFrame(results, dim_percs, size_percs)
 sns.heatmap(df, annot=True)
-plt.xlabel("Bag size - percent of training dataset size")
-plt.ylabel("Attributes count - percent of all attributes count")
+plt.xlabel("Procent zbioru uczącego w worku")
+plt.ylabel("Procent atrybutów obiektów w worku")
 plt.show()
 
 # todo
-# cart - 3 pierwsze liczbowe przebadaj
-# klasyfikatory może badaj na domyślnych, a porównaj z optymalnym
+#+ cart - 3 pierwsze liczbowe przebadaj
+#+ klasyfikatory może badaj na domyślnych, a porównaj z optymalnym
 # dla baggingu liczba klasyfikatorów/bag_size, sztywne 100 proc atrybutów
 # dla rf heatmapa size/dim, na rozmiarze z baggingu może
 # dla adabooosta tylko liczba klasyfikatorów i obczaj jakie on rozmiary zakłada
